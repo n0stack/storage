@@ -68,21 +68,23 @@ func (n *ChunkStoreNode) WriteChunk(ctx context.Context, req *WriteChunkRequest)
 		if chunk.Size() < req.Offset {
 			return errors.New("Delaying sync")
 		}
+
+		chunk.Lock()
 		if _, err := chunk.Seek(req.Offset, io.SeekStart); err != nil {
 			return errors.Wrap(err, "Seek()")
 		}
 		if chunk.Checksum() != req.PreChecksum {
 			return errors.Errorf("mismatch pre-checksum: want=0x%016x, have=0x%016x", chunk.Checksum(), req.PreChecksum)
 		}
-
 		if _, err := io.Copy(chunk, fpr); err != nil {
 			return errors.Wrap(err, "Copy()")
 		}
-
 		if chunk.Checksum() != req.PostChecksum {
 			return errors.Errorf("mismatch post-checksum: want=0x%016x, have=0x%016x", chunk.Checksum(), req.PostChecksum)
 		}
+		chunk.Unlock()
 
+		// TODO: Sync() までロックすべきなのかチェックする
 		if err := chunk.Sync(); err != nil {
 			return errors.Wrap(err, "Sync()")
 		}
