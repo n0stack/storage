@@ -42,11 +42,6 @@ func (c *MemoryChunk) Close() error {
 	return nil
 }
 
-func (c *MemoryChunk) Seek(offset int64, whence int) (n int64, err error) {
-	n, err = c.reader.Seek(offset, whence)
-
-	return
-}
 func (c MemoryChunk) Read(b []byte) (n int, err error) {
 	n, err = c.reader.Read(b)
 
@@ -79,6 +74,11 @@ func (c *MemoryChunk) Write(b []byte) (n int, err error) {
 
 func (c MemoryChunk) Sync() error {
 	return nil
+}
+func (c *MemoryChunk) Seek(offset int64, whence int) (n int64, err error) {
+	n, err = c.reader.Seek(offset, whence)
+
+	return
 }
 
 func (c MemoryChunk) Size() int64 {

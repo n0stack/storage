@@ -50,15 +50,6 @@ func (c *FileChunk) Close() error {
 	return c.file.Close()
 }
 
-// TODO: nの値の扱いについて
-func (c *FileChunk) Seek(offset int64, whence int) (n int64, err error) {
-	n, err = c.file.Seek(offset, whence)
-	if err != nil {
-		return 0, errors.Wrap(err, "file.Seek()")
-	}
-
-	return
-}
 func (c FileChunk) Read(b []byte) (n int, err error) {
 	return c.file.Read(b)
 }
@@ -85,6 +76,16 @@ func (c *FileChunk) Write(b []byte) (n int, err error) {
 	}
 
 	c.checksum = crc64.Update(c.checksum, CHUNK_CHECKSUM_TABLE, b)
+
+	return
+}
+
+// TODO: nの値の扱いについて
+func (c *FileChunk) Seek(offset int64, whence int) (n int64, err error) {
+	n, err = c.file.Seek(offset, whence)
+	if err != nil {
+		return 0, errors.Wrap(err, "file.Seek()")
+	}
 
 	return
 }
