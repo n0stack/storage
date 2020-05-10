@@ -28,10 +28,6 @@ func OpenChunkStoreNode(open func(uuid.UUID) (ChunkInterface, error), remote Chu
 }
 
 func (n *ChunkStoreNode) WriteChunk(ctx context.Context, req *WriteChunkRequest) (*WriteChunkResponse, error) {
-	// if MAX_CHUNK_SIZE-req.Offset < req.Data.Size {
-	// 	return nil, ErrorExceededChunkSize
-	// }
-
 	eg, _ := errgroup.WithContext(ctx)
 	fpr, fpw := io.Pipe()
 	hpr, hpw := io.Pipe()

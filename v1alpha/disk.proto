@@ -1,0 +1,84 @@
+syntax = "proto3";
+
+option go_package = "github.com/n0stack/storage/v1alpha;pstorage";
+
+package n0stack.storage.v1alpha;
+
+import "n0stack/storage/api/metadata.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+
+enum DiskSpecStatus {
+  DISK_SPEC_STATUS_UNSPECIFIED = 0;
+
+  ACTIVE = 1;
+  DRAIN = 2;
+}
+message DiskSpec {
+  DiskSpecStatus status = 1;
+
+  uint64 total_bytes = 2;
+}
+
+enum DiskFactStatus {
+  DISK_FACT_STATUS_UNSPECIFIED = 0;
+
+  UP = 1;
+  DOWN = 2;
+}
+message DiskFact {
+  DiskFactStatus status = 1;
+
+  uint64 used_bytes = 2;
+
+  string url = 3;
+}
+
+message Disk {
+  n0stack.storage.api.Metadata metadata = 1;
+  DiskSpec spec = 2;
+  DiskFact fact = 3;
+}
+
+
+service DiskService {
+  rpc ApplyDisk(Disk) returns (Disk) {
+    option (google.api.http) = {
+      post: "/api/storage/v1alpha/disks"
+      body: "*"
+    };
+  }
+  
+  rpc ListDisks(ListDisksRequest) returns (ListDisksResponse) {
+    option (google.api.http) = {
+      get: "/api/storage/v1alpha/disks"
+    };
+  }
+  
+  rpc GetDisk(GetDiskRequest) returns (Disk) {
+    option (google.api.http) = {
+      get: "/api/storage/v1alpha/disks/{name}"
+    };
+  }
+  
+  rpc DeleteDisk(DeleteDiskRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/storage/v1alpha/disks/{name}"
+    };
+  }
+}
+
+
+message ListDisksRequest {}
+message ListDisksResponse {
+  repeated Disk disks = 1;
+}
+
+message GetDiskRequest {
+  string name = 1;
+}
+
+message DeleteDiskRequest {
+  string name = 1;
+}

@@ -8,7 +8,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 )
 
-const DEFAULT_MAX_CHUNK_SIZE = 128 * 1024 * 1024 // = 128 MB
+const DEFAULT_MAX_CHUNK_SIZE int64 = 128 * 1024 * 1024 // = 128 MB
 
 type WriteChunkRequest struct {
 	ID uuid.UUID

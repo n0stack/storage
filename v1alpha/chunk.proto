@@ -1,0 +1,93 @@
+syntax = "proto3";
+
+option go_package = "github.com/n0stack/storage/v1alpha;pstorage";
+
+package n0stack.storage.v1alpha;
+
+import "n0stack/storage/api/metadata.proto";
+import "n0stack/storage/v1alpha/disk.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/field_mask.proto";
+
+
+// あるべき姿を記述する
+// 一般にUser Interfaceになりがちだが、そうであるとは限らない
+message ChunkSpec { 
+  repeated n0stack.storage.v1alpha.Disk disks = 1;
+}
+
+// 実際の状態を記述する
+// 一般にAdministrator Interfaceになりがちだが、そうであるとは限らない
+// REST APIからは操作できず、gRPC インタフェースから操作することを強制する
+message ChunkFact {
+  int64 offset = 1;
+  uint64 crc64= 2;
+  
+  repeated n0stack.storage.v1alpha.Disk health_disks = 3;
+  repeated n0stack.storage.v1alpha.Disk desync_disks = 4;
+}
+
+message Chunk {
+  n0stack.storage.api.Metadata metadata = 1;
+  ChunkSpec spec = 2;
+  ChunkFact fact = 3;
+}
+
+
+service ChunkService {
+  rpc ApplyChunk(Chunk) returns (Chunk) {
+    option (google.api.http) = {
+      post: "/api/storage/v1alpha/chunks"
+      body: "chunk"
+    };
+  }
+  
+  rpc ListChunks(ListChunksRequest) returns (ListChunksResponse) {
+    option (google.api.http) = {
+      get: "/api/storage/v1alpha/chunks"
+    };
+  }
+  
+  rpc GetChunk(GetChunkRequest) returns (Chunk) {
+    option (google.api.http) = {
+      get: "/api/storage/v1alpha/chunks/{name}"
+    };
+  }
+  
+  rpc DeleteChunk(DeleteChunkRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/api/storage/v1alpha/chunks/{name}"
+    };
+  }
+
+  rpc CommitChunk(CommitChunkRequest) returns (Chunk) {}
+}
+
+// message ApplyChunkRequest {
+//   n0stack.storage.api.Metadata metadata = 1;
+//   ChunkSpec spec = 2;
+// }
+
+message ListChunksRequest {}
+message ListChunksResponse {
+  repeated Chunk chunks = 1;
+}
+
+message GetChunkRequest {
+  string name = 1;
+}
+
+message DeleteChunkRequest {
+  string name = 1;
+}
+
+message CommitChunkRequest {
+  string name = 1;
+
+  int64 offset = 2;
+  uint64 crc64= 3;
+  
+  repeated string health_disks = 4;
+  repeated string desync_disks = 5;
+}

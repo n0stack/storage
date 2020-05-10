@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option go_package = "github.com/n0stack/storage/api;api";
+
+package n0stack.storage.api.database;
+
+import "n0stack/storage/api/metadata.proto";
+
+
+message TestEntitySpec {}
+message TestEntityFact {}
+
+message TestEntity {
+  n0stack.storage.api.Metadata metadata = 1;
+  TestEntitySpec spec = 2;
+  TestEntityFact fact = 3;
+}

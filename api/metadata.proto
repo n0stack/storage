@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option go_package = "github.com/n0stack/storage/api;api";
+
+package n0stack.storage.api;
+
+import "google/protobuf/timestamp.proto";
+
+
+message Metadata { 
+  string name = 1;
+  // string namespace = 2;
+
+  // optional
+  string uid = 3;
+
+  map<string, string> labels = 4;
+  map<string, string> annotations = 5;
+
+  uint64 revision = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp deleted_at = 8;
+}

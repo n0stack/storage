@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+option go_package = "github.com/n0stack/storage/api;api";
+
+package n0stack.storage.api;
+
+import "google/protobuf/timestamp.proto";
+
+
+// the entity is down if next_heartbeat < now
+message Heartbeat { 
+  google.protobuf.Timestamp last_heartbeat = 1;
+  google.protobuf.Timestamp next_heartbeat = 2;
+}
